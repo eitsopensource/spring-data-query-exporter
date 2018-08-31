@@ -8,5 +8,134 @@
     <artifactId>spring-data-query-exporter</artifactId>
     <version>1.0.0</version>
 
+    <properties>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <dynamic-jasper-core-fonts.version>1.0</dynamic-jasper-core-fonts.version>
+        <dynamic-jasper.version>5.0.9</dynamic-jasper.version>
+        <apache-poi.version>3.14</apache-poi.version>
+        <opencsv.version>4.1</opencsv.version>
+        <dwr.version>3.0.2-RELEASE</dwr.version>
+    </properties>
 
+    <!-- Repositories -->
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <url>http://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>eits-repository-release</id>
+            <url>http://maven.eits.com.br/content/repositories/releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>eits-repository-snapshot</id>
+            <url>http://maven.eits.com.br/content/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>eits-repository-snapshot</id>
+            <name>eits-snapshots</name>
+            <url>http://maven.eits.com.br/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>eits-repository-release</id>
+            <url>http://maven.eits.com.br/content/repositories/releases</url>
+        </repository>
+    </distributionManagement>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-milestones</id>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>eits-repository-release</id>
+            <url>http://maven.eits.com.br/content/repositories/releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+        <pluginRepository>
+            <id>eits-repository-snapshot</id>
+            <url>http://maven.eits.com.br/content/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ar.com.fdvs</groupId>
+            <artifactId>DynamicJasper-core-fonts</artifactId>
+            <version>${dynamic-jasper-core-fonts.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ar.com.fdvs</groupId>
+            <artifactId>DynamicJasper</artifactId>
+            <version>${dynamic-jasper.version}</version>
+        </dependency>
+
+        <!-- XLS -->
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${apache-poi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
+        </dependency>
+
+        <!-- CSV -->
+
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>${opencsv.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.directwebremoting</groupId>
+            <artifactId>dwr</artifactId>
+            <version>${dwr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+            <version>1.13.10.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+            <version>1.11.10.RELEASE</version>
+        </dependency>
+    </dependencies>
 </project>
