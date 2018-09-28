@@ -65,4 +65,31 @@ public final class EntityPropertyExtractor
 			throw new IllegalStateException( e );
 		}
 	}
+
+	public static Class<?> extractPropertyType( Object entity, String path )
+	{
+		Assert.isTrue( PROPERTY_PATTERN.matcher( path ).matches(), "O caminho de propriedade \"" + path + "\" para a entidade " + entity.getClass().getSimpleName() + " é inválido." );
+		try
+		{
+			if ( !path.contains( "." ) )
+			{
+				PropertyDescriptor propertyDescriptor = Arrays.stream( Introspector.getBeanInfo( entity.getClass() ).getPropertyDescriptors() )
+						.filter( property -> path.equals( property.getName() ) ).findAny()
+						.orElseThrow( () -> new IllegalArgumentException( "Não foi encontrada uma propriedade de nome \"" + path + "\" na entidade " + entity.getClass().getSimpleName() ) );
+				return propertyDescriptor.getPropertyType();
+			}
+			else
+			{
+				return extractPropertyType( extractPropertyValue( entity, path.split( "\\." )[0] ), path.substring( path.indexOf( "." ) + 1 ) );
+			}
+		}
+		catch ( NullPointerException e )
+		{
+			return null;
+		}
+		catch ( IntrospectionException e )
+		{
+			throw new IllegalStateException( e );
+		}
+	}
 }

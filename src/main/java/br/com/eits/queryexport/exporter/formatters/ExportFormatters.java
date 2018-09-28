@@ -11,7 +11,7 @@ import br.com.eits.queryexport.QueryColumn;
 @SuppressWarnings("unchecked")
 public abstract class ExportFormatters
 {
-	private static final Map<Class<?>, DateFormatter<?>> FORMATTERS = new HashMap<>();
+	public static final Map<Class<?>, ObjectFormatter<?>> FORMATTERS = new HashMap<>();
 
 	static
 	{
@@ -28,7 +28,7 @@ public abstract class ExportFormatters
 	public static String convert( Object value, String pattern )
 	{
 		return FORMATTERS.entrySet().stream().filter( entry -> entry.getKey().isAssignableFrom( value.getClass() ) )
-				.map( Map.Entry::getValue ).map( converter -> ((DateFormatter<Object>) converter).format( value, pattern ) ).findFirst()
+				.map( Map.Entry::getValue ).map( converter -> ((ObjectFormatter<Object>) converter).format( value, pattern ) ).findFirst()
 				.orElseThrow( () -> new IllegalArgumentException( "Não existe conversor para a classe " + value.getClass().getSimpleName() ) );
 	}
 

@@ -6,7 +6,7 @@ import java.util.Map;
 
 import ar.com.fdvs.dj.domain.CustomExpression;
 
-public class OffsetDateTimeFormatter implements CustomExpression, DateFormatter<OffsetDateTime>
+public class OffsetDateTimeFormatter implements CustomExpression, ObjectFormatter<OffsetDateTime>
 {
 	private final String property;
 	private final DateTimeFormatter formatter;
@@ -34,5 +34,11 @@ public class OffsetDateTimeFormatter implements CustomExpression, DateFormatter<
 	public String format( OffsetDateTime object, String pattern )
 	{
 		return DateTimeFormatter.ofPattern( pattern ).format( object );
+	}
+
+	@Override
+	public CustomExpression getCustomExpression( String propertyPath )
+	{
+		return null;
 	}
 }

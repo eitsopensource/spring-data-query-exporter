@@ -1,5 +1,6 @@
 package br.com.eits.queryexport.exporter;
 
+import java.beans.Introspector;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -7,13 +8,24 @@ import java.util.List;
 import br.com.eits.queryexport.EntityPropertyExtractor;
 import br.com.eits.queryexport.QueryColumn;
 import br.com.eits.queryexport.exporter.formatters.ExportFormatters;
+import lombok.val;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.hibernate.Hibernate;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 public class XLSExporter implements Exporter
 {
+	private final MessageSource messageSource;
+
+	public XLSExporter( MessageSource messageSource )
+	{
+		this.messageSource = messageSource;
+	}
+
 	@Override
 	public ByteArrayOutputStream export( Class<?> entityClass, String queryName, List<QueryColumn> columns, List<?> rows )
 	{
@@ -41,8 +53,31 @@ public class XLSExporter implements Exporter
 			Row row = sheet.createRow( i + 1 );
 			for ( int j = 0; j < columns.size(); j++ )
 			{
-				String columnText = ExportFormatters.convertIfNecessary( columns.get( j ), EntityPropertyExtractor.extractPropertyValue( rows.get( i ), columns.get( j ).getAttributePath() ) );
-				row.createCell( j ).setCellValue( columnText );
+				val cell = row.createCell( j );
+				val rowType = EntityPropertyExtractor.extractPropertyType( rows.get( i ), columns.get( j ).getAttributePath() );
+				val rowValue = EntityPropertyExtractor.extractPropertyValue( rows.get( i ), columns.get( j ).getAttributePath() );
+				val typeName = Introspector.decapitalize( Hibernate.getClass( rows.get( i ) ).getSimpleName() );
+				if ( rowType != null && rowValue != null )
+				{
+					if ( Number.class.isAssignableFrom( rowType ) )
+					{
+						cell.setCellValue( ((Number) rowValue).doubleValue() );
+					}
+					else if ( Boolean.class.isAssignableFrom( rowType ) )
+					{
+						cell.setCellValue( messageSource.getMessage( typeName + "." + columns.get( j ).getAttributePath() + "." + rowValue, null, LocaleContextHolder.getLocale() ) );
+					}
+					else if ( rowValue instanceof Enum<?> )
+					{
+						cell.setCellValue( messageSource.getMessage( typeName + "." + columns.get( j ).getAttributePath() + "." + ((Enum<?>) rowValue).name(), null, LocaleContextHolder.getLocale() ) );
+					}
+					else
+					{
+						String columnText = ExportFormatters.convertIfNecessary( columns.get( j ), EntityPropertyExtractor.extractPropertyValue( rows.get( i ), columns.get( j ).getAttributePath() ) );
+						cell.setCellValue( columnText );
+					}
+				}
+
 			}
 		}
 	}

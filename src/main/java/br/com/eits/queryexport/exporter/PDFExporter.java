@@ -1,6 +1,7 @@
 package br.com.eits.queryexport.exporter;
 
 import java.awt.image.BufferedImage;
+import java.beans.Introspector;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -10,12 +11,14 @@ import java.time.OffsetDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
 import ar.com.fdvs.dj.core.DynamicJasperHelper;
 import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
 import ar.com.fdvs.dj.domain.ColumnProperty;
+import ar.com.fdvs.dj.domain.CustomExpression;
 import ar.com.fdvs.dj.domain.DynamicReport;
 import ar.com.fdvs.dj.domain.ImageBanner;
 import ar.com.fdvs.dj.domain.Style;
@@ -28,13 +31,17 @@ import ar.com.fdvs.dj.domain.constants.Page;
 import br.com.eits.queryexport.EntityPropertyExtractor;
 import br.com.eits.queryexport.QueryColumn;
 import br.com.eits.queryexport.QueryExportConfiguration;
+import br.com.eits.queryexport.exporter.formatters.ExportFormatters;
 import br.com.eits.queryexport.exporter.formatters.LocalDateTimeFormatter;
 import br.com.eits.queryexport.exporter.formatters.OffsetDateTimeFormatter;
+import lombok.val;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.apache.commons.io.IOUtils;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 public class PDFExporter implements Exporter
 {
@@ -44,24 +51,32 @@ public class PDFExporter implements Exporter
 	private final String reportTitle;
 	private final BufferedImage reportImage;
 	private final File reportImagePath;
+	private final MessageSource messageSource;
 
-	public PDFExporter( QueryExportConfiguration queryExportConfiguration ) throws IOException
+	public PDFExporter( QueryExportConfiguration queryExportConfiguration, MessageSource messageSource )
 	{
-		this.reportTitle = queryExportConfiguration.getReportTitle();
-		if ( queryExportConfiguration.getReportImage() != null )
+		this.messageSource = messageSource;
+		try
 		{
-			this.reportImage = ImageIO.read( getClass().getResourceAsStream( queryExportConfiguration.getReportImage() ) );
-			this.reportImagePath = File.createTempFile( "singra-report", "png" );
-			FileOutputStream fos = new FileOutputStream( reportImagePath );
-			IOUtils.copy( getClass().getResourceAsStream( queryExportConfiguration.getReportImage() ), fos );
-			fos.close();
+			this.reportTitle = queryExportConfiguration.getReportTitle();
+			if ( queryExportConfiguration.getReportImage() != null )
+			{
+				this.reportImage = ImageIO.read( getClass().getResourceAsStream( queryExportConfiguration.getReportImage() ) );
+				this.reportImagePath = File.createTempFile( "singra-report", "png" );
+				FileOutputStream fos = new FileOutputStream( reportImagePath );
+				IOUtils.copy( getClass().getResourceAsStream( queryExportConfiguration.getReportImage() ), fos );
+				fos.close();
+			}
+			else
+			{
+				this.reportImage = null;
+				this.reportImagePath = null;
+			}
 		}
-		else
+		catch ( IOException e )
 		{
-			this.reportImage = null;
-			this.reportImagePath = null;
+			throw new IllegalArgumentException( e );
 		}
-
 	}
 
 	@Override
@@ -88,6 +103,60 @@ public class PDFExporter implements Exporter
 				else if ( OffsetDateTime.class.isAssignableFrom( propType ) )
 				{
 					columnBuilder.setCustomExpression( new OffsetDateTimeFormatter( column.getAttributePath(), column.getDateTimePattern() ) );
+				}
+				else if ( Boolean.class.isAssignableFrom( propType ) )
+				{
+					columnBuilder.setCustomExpression( new CustomExpression()
+					{
+						@Override
+						public Object evaluate( Map fields, Map variables, Map parameters )
+						{
+							val boolValue = (Boolean) fields.get( column.getAttributePath() );
+							if ( boolValue == null )
+							{
+								return null;
+							}
+							val messageField = Introspector.decapitalize( entityClass.getSimpleName() ) + "." + column.getAttributePath() + "." + boolValue;
+							return messageSource.getMessage( messageField, null, LocaleContextHolder.getLocale() );
+						}
+
+						@Override
+						public String getClassName()
+						{
+							return String.class.getName();
+						}
+					} );
+				}
+				else if ( Enum.class.isAssignableFrom( propType ) )
+				{
+					columnBuilder.setCustomExpression( new CustomExpression()
+					{
+						@Override
+						public Object evaluate( Map fields, Map variables, Map parameters )
+						{
+							val enumValue = (Enum<?>) fields.get( column.getAttributePath() );
+							if ( enumValue == null )
+							{
+								return null;
+							}
+							val messageField = Introspector.decapitalize( entityClass.getSimpleName() ) + "." + column.getAttributePath() + "." + enumValue.name();
+							return messageSource.getMessage( messageField, null, LocaleContextHolder.getLocale() );
+						}
+
+						@Override
+						public String getClassName()
+						{
+							return String.class.getName();
+						}
+					} );
+				}
+				else if ( ExportFormatters.FORMATTERS.containsKey( propType ) )
+				{
+					CustomExpression expression = ExportFormatters.FORMATTERS.get( propType ).getCustomExpression( column.getAttributePath() );
+					if ( expression != null )
+					{
+						columnBuilder.setCustomExpression( expression );
+					}
 				}
 				builder.addColumn( columnBuilder.build() );
 			}

@@ -6,7 +6,7 @@ import java.util.Map;
 
 import ar.com.fdvs.dj.domain.CustomExpression;
 
-public class LocalDateTimeFormatter implements CustomExpression, DateFormatter<LocalDateTime>
+public class LocalDateTimeFormatter implements CustomExpression, ObjectFormatter<LocalDateTime>
 {
 	private final String property;
 	private final DateTimeFormatter formatter;
@@ -34,5 +34,11 @@ public class LocalDateTimeFormatter implements CustomExpression, DateFormatter<L
 	public String format( LocalDateTime object, String pattern )
 	{
 		return DateTimeFormatter.ofPattern( pattern ).format( object );
+	}
+
+	@Override
+	public CustomExpression getCustomExpression( String propertyPath )
+	{
+		return null;
 	}
 }

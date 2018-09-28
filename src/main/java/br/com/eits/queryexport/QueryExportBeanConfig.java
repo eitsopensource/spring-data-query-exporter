@@ -1,6 +1,5 @@
 package br.com.eits.queryexport;
 
-import java.io.IOException;
 import java.util.Set;
 
 import br.com.eits.queryexport.exporter.CSVExporter;
@@ -17,21 +16,21 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public class QueryExportBeanConfig
 {
 	@Bean
-	public Exporter pdfExporter( QueryExportConfiguration queryExportConfiguration ) throws IOException
+	public Exporter pdfExporter( QueryExportConfiguration queryExportConfiguration, MessageSource messageSource )
 	{
-		return new PDFExporter( queryExportConfiguration );
+		return new PDFExporter( queryExportConfiguration, messageSource );
 	}
 
 	@Bean
-	public Exporter csvExporter()
+	public Exporter csvExporter( MessageSource messageSource )
 	{
-		return new CSVExporter();
+		return new CSVExporter( messageSource );
 	}
 
 	@Bean
-	public Exporter xlsExporter()
+	public Exporter xlsExporter( MessageSource messageSource )
 	{
-		return new XLSExporter();
+		return new XLSExporter( messageSource );
 	}
 
 	@Bean

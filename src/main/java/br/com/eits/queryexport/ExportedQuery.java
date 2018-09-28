@@ -49,12 +49,16 @@ public class ExportedQuery
 					.map( field -> QueryColumn.of( field.value(), getLocalizedLabelForAttribute( entityClass, field.value() ), field.width(), field.pattern() ) )
 					.collect( Collectors.toList() );
 		}
-		else
+		else if ( method.getAnnotation( EntityGraph.class ) != null )
 		{
 			return Arrays.stream( method.getAnnotation( EntityGraph.class ).attributePaths() )
 					.filter( path -> !path.equals( "id" ) )
 					.map( path -> QueryColumn.of( path, getLocalizedLabelForAttribute( entityClass, path ), 0, Field.DATE_TIME_PATTERN ) )
 					.collect( Collectors.toList() );
+		}
+		else
+		{
+			throw new IllegalStateException( "Faltando declaração de campos ou @EntityGraph no repositório da entidade " + entityClass.getSimpleName() + ", método " + method );
 		}
 	}
 
