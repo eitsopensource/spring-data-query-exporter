@@ -40,15 +40,15 @@ public class DummyXLSExport
 		val query = queryExporter.export(
 				DummyEntity.class,
 				new PageImpl<>( Arrays.asList(
-						new DummyEntity( 1L, "um", true, new BigDecimal( "2.50" ), DummyEntity.DummyEntityStatus.AUTHORIZED ),
+						new DummyEntity( 1L, "um um um um um um um um um um um um um um", true, new BigDecimal( "2.50" ), DummyEntity.DummyEntityStatus.AUTHORIZED ),
 						new DummyEntity( 2L, "dois", false, new BigDecimal( "2.50" ), DummyEntity.DummyEntityStatus.PENDING ),
-						new DummyEntity( 3L, "tres", null, null, null )
+						new DummyEntity( 3L, "tres", null, new BigDecimal( "1500.50" ), null )
 				) ),
 				"test"
 		);
-		val baos = query.to( QueryExportFormat.CSV ).getOutputStream();
+		val baos = query.to( QueryExportFormat.XLS ).getOutputStream();
 		val bais = new ByteArrayInputStream( baos.toByteArray() );
-		val file = new File( "/tmp/test-output.csv" );
+		val file = new File( "/tmp/test-output.xls" );
 		file.delete();
 		file.createNewFile();
 		val output = new FileOutputStream( file );

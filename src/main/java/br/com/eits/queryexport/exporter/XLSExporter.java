@@ -3,6 +3,7 @@ package br.com.eits.queryexport.exporter;
 import java.beans.Introspector;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 import br.com.eits.queryexport.EntityPropertyExtractor;
@@ -61,7 +62,12 @@ public class XLSExporter implements Exporter
 				{
 					if ( Number.class.isAssignableFrom( rowType ) )
 					{
-						cell.setCellValue( ((Number) rowValue).doubleValue() );
+						val cellStyle = cell.getCellStyle();
+						val useFloatStyle = rowValue instanceof Double || rowValue instanceof Float || rowValue instanceof BigDecimal;
+						cellStyle.setDataFormat( useFloatStyle ?
+								sheet.getWorkbook().createDataFormat().getFormat( "#,##0.00" ) :
+								sheet.getWorkbook().createDataFormat().getFormat( "#,##0" ) );
+						cell.setCellValue( useFloatStyle ? ((Number) rowValue).doubleValue() : ((Number) rowValue).longValue() );
 					}
 					else if ( Boolean.class.isAssignableFrom( rowType ) )
 					{
@@ -79,6 +85,10 @@ public class XLSExporter implements Exporter
 				}
 
 			}
+		}
+		for ( int i = 0; i < columns.size(); i++ )
+		{
+			sheet.autoSizeColumn( i );
 		}
 	}
 
