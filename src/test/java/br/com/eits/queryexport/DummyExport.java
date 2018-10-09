@@ -42,7 +42,7 @@ public class DummyExport
 				new PageImpl<>( Arrays.asList(
 						new DummyEntity( 1L, "um um um um um um um um um um um um um um", true, new BigDecimal( "2.50" ), DummyEntity.DummyEntityStatus.AUTHORIZED ),
 						new DummyEntity( 2L, "dois", false, new BigDecimal( "2.50" ), DummyEntity.DummyEntityStatus.PENDING ),
-						new DummyEntity( 3L, "tres", null, new BigDecimal( "1500.50" ), null )
+						new DummyEntity( 3L, "tres", null, new BigDecimal( "1500" ), null )
 				) ),
 				"test"
 		);
