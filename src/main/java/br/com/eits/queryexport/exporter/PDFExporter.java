@@ -153,7 +153,7 @@ public class PDFExporter implements Exporter
 						}
 					} );
 				}
-				else if ( Number.class.isAssignableFrom( propType ) )
+				else if ( Number.class.isAssignableFrom( propType ) && column.isFormattingEnabled() )
 				{
 					val useFloatStyle = Stream.of( Double.class, Float.class, BigDecimal.class ).anyMatch( c -> c.isAssignableFrom( propType ) );
 					columnBuilder.setCustomExpression( new CustomExpression()

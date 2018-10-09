@@ -27,4 +27,9 @@ public @interface Field
 	 * Pattern para exibição de data/hora.
 	 */
 	String pattern() default DATE_TIME_PATTERN;
+
+	/**
+	 * Usar máscaras e formatação (separação de milhares) nos números.
+	 */
+	boolean format() default true;
 }

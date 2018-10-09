@@ -9,4 +9,5 @@ public class QueryColumn
 	private final String localizedLabel;
 	private final int percentualWidth;
 	private final String dateTimePattern;
+	private final boolean formattingEnabled;
 }

@@ -46,14 +46,14 @@ public class ExportedQuery
 		if ( method.getAnnotation( ExportableQuery.class ).fields().length > 0 )
 		{
 			return Arrays.stream( method.getAnnotation( ExportableQuery.class ).fields() )
-					.map( field -> QueryColumn.of( field.value(), getLocalizedLabelForAttribute( entityClass, field.value() ), field.width(), field.pattern() ) )
+					.map( field -> QueryColumn.of( field.value(), getLocalizedLabelForAttribute( entityClass, field.value() ), field.width(), field.pattern(), field.format() ) )
 					.collect( Collectors.toList() );
 		}
 		else if ( method.getAnnotation( EntityGraph.class ) != null )
 		{
 			return Arrays.stream( method.getAnnotation( EntityGraph.class ).attributePaths() )
 					.filter( path -> !path.equals( "id" ) )
-					.map( path -> QueryColumn.of( path, getLocalizedLabelForAttribute( entityClass, path ), 0, Field.DATE_TIME_PATTERN ) )
+					.map( path -> QueryColumn.of( path, getLocalizedLabelForAttribute( entityClass, path ), 0, Field.DATE_TIME_PATTERN, true ) )
 					.collect( Collectors.toList() );
 		}
 		else

@@ -64,9 +64,12 @@ public class XLSExporter implements Exporter
 					{
 						val cellStyle = cell.getCellStyle();
 						val useFloatStyle = rowValue instanceof Double || rowValue instanceof Float || rowValue instanceof BigDecimal;
-						cellStyle.setDataFormat( useFloatStyle ?
-								sheet.getWorkbook().createDataFormat().getFormat( "#,##0.00" ) :
-								sheet.getWorkbook().createDataFormat().getFormat( "#,##0" ) );
+						if ( columns.get( j ).isFormattingEnabled() )
+						{
+							cellStyle.setDataFormat( useFloatStyle ?
+									sheet.getWorkbook().createDataFormat().getFormat( "#,##0.00" ) :
+									sheet.getWorkbook().createDataFormat().getFormat( "#,##0" ) );
+						}
 						cell.setCellValue( useFloatStyle ? ((Number) rowValue).doubleValue() : ((Number) rowValue).longValue() );
 					}
 					else if ( Boolean.class.isAssignableFrom( rowType ) )
