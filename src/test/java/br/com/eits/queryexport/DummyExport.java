@@ -36,7 +36,7 @@ public class DummyExport
 				new HashSet<>( Arrays.asList( new CSVExporter( messageSource ), new XLSExporter( messageSource ), new PDFExporter( exportConfig, messageSource ) ) ),
 				messageSource
 		);
-		LocaleContextHolder.setLocale( new Locale( "en" ) );
+		LocaleContextHolder.setLocale( new Locale( "pt" ) );
 		val query = queryExporter.export(
 				DummyEntity.class,
 				new PageImpl<>( Arrays.asList(
