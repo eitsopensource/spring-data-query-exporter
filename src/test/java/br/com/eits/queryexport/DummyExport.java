@@ -24,7 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public class DummyXLSExport
+public class DummyExport
 {
 	public static void main( String[] args ) throws Exception
 	{
@@ -46,9 +46,9 @@ public class DummyXLSExport
 				) ),
 				"test"
 		);
-		val baos = query.to( QueryExportFormat.XLS ).getOutputStream();
+		val baos = query.to( QueryExportFormat.PDF ).getOutputStream();
 		val bais = new ByteArrayInputStream( baos.toByteArray() );
-		val file = new File( "/tmp/test-output.xls" );
+		val file = new File( "/tmp/test-output.pdf" );
 		file.delete();
 		file.createNewFile();
 		val output = new FileOutputStream( file );

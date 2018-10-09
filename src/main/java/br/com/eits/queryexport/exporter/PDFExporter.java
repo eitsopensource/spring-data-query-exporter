@@ -6,12 +6,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
@@ -141,6 +144,32 @@ public class PDFExporter implements Exporter
 							}
 							val messageField = Introspector.decapitalize( entityClass.getSimpleName() ) + "." + column.getAttributePath() + "." + enumValue.name();
 							return messageSource.getMessage( messageField, null, LocaleContextHolder.getLocale() );
+						}
+
+						@Override
+						public String getClassName()
+						{
+							return String.class.getName();
+						}
+					} );
+				}
+				else if ( Number.class.isAssignableFrom( propType ) )
+				{
+					val useFloatStyle = Stream.of( Double.class, Float.class, BigDecimal.class ).anyMatch( c -> c.isAssignableFrom( propType ) );
+					columnBuilder.setCustomExpression( new CustomExpression()
+					{
+						@Override
+						public Object evaluate( Map fields, Map variables, Map parameters )
+						{
+							val numberValue = (Number) fields.get( column.getAttributePath() );
+							if ( numberValue == null )
+							{
+								return "";
+							}
+							val decimalFormat = useFloatStyle ?
+									DecimalFormat.getNumberInstance( LocaleContextHolder.getLocale() ) :
+									DecimalFormat.getInstance( LocaleContextHolder.getLocale() );
+							return decimalFormat.format( useFloatStyle ? numberValue.doubleValue() : numberValue.longValue() );
 						}
 
 						@Override
